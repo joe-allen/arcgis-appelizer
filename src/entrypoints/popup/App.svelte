@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   // import svelteLogo from "../../assets/svelte.svg";
-  import DevTools from "../../lib/DevTools.svelte";
+  import Services from "../../lib/Services.svelte";
   import ProductAnalyzer from "../../lib/ProductAnalyzer.svelte";
 
   let rows = $state<
@@ -35,7 +35,7 @@
   <div class="card">
     {#if rows.length > 0}
       <ProductAnalyzer />
-      <DevTools />
+      <Services />
     {:else}
       <p class="card__message">
         No ArcGIS Product or content requests captured for this page.

@@ -4,7 +4,7 @@
   // Requests are captured by the background service worker via
   // `browser.webRequest` and stored in `storage.session`. Reading from storage
   // lets this component populate in ANY extension context (popup or panel),
-  // not just the DevTools page.
+  // not just the DevTools panel.
 
   type RequestRow = {
     method: string;
