@@ -26,20 +26,21 @@ export default defineBackground(() => {
       const incomingUrl: string | undefined = message.url;
       browser.storage.session.get(LAST_URL_KEY).then((stored) => {
         const lastUrl = stored[LAST_URL_KEY] as string | undefined;
-        if (incomingUrl !== lastUrl) {
+        const urlChanged = lastUrl !== undefined && incomingUrl !== lastUrl;
+        if (urlChanged) {
           rows = [];
-          void browser.storage.session.set({
-            [STORAGE_KEY]: [],
-            [LAST_URL_KEY]: incomingUrl,
-          });
+          void browser.storage.session.set({ [STORAGE_KEY]: [] });
         }
+        void browser.storage.session.set({ [LAST_URL_KEY]: incomingUrl });
       });
     }
   });
 
   browser.webRequest.onCompleted.addListener(
     (details) => {
-      if (!captureRequest(details.url)) return;
+      if (!captureRequest(details.url)) {
+        return;
+      }
 
       const contentLength = details.responseHeaders?.find(
         (h) => h.name.toLowerCase() === "content-length",
@@ -51,6 +52,19 @@ export default defineBackground(() => {
       };
 
       hydrated.finally(() => {
+        if (details.tabId >= 0) {
+          void browser.action.setIcon({
+            tabId: details.tabId,
+            path: {
+              16: "/icon/16-active.png",
+              32: "/icon/32-active.png",
+              48: "/icon/48-active.png",
+              96: "/icon/96-active.png",
+              128: "/icon/128-active.png",
+            },
+          });
+        }
+
         // Skip if this URL is already recorded (query string already stripped).
         if (rows.some((r) => r.url === row.url)) return;
 
@@ -62,4 +76,20 @@ export default defineBackground(() => {
     { urls: ["<all_urls>"] },
     ["responseHeaders"],
   );
+
+  // Reset to default icon when the tab navigates away.
+  browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (changeInfo.status === "loading") {
+      void browser.action.setIcon({
+        tabId,
+        path: {
+          16: "/icon/16.png",
+          32: "/icon/32.png",
+          48: "/icon/48.png",
+          96: "/icon/96.png",
+          128: "/icon/128.png",
+        },
+      });
+    }
+  });
 });

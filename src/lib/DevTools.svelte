@@ -48,7 +48,7 @@
 <table>
   <thead>
     <tr>
-      <th>URL</th>
+      <th>Requests</th>
       <th>Size</th>
     </tr>
   </thead>
@@ -74,24 +74,28 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-family: system-ui, sans-serif;
     font-size: 12px;
   }
   th,
   td {
     text-align: left;
-    padding: 4px 8px;
+    padding: 4px 8px 4px 0;
     border-bottom: 1px solid #ddd;
+
+    a {
+      display: inline-block;
+    }
   }
   th {
     position: sticky;
+    padding: 4px 0;
     top: 0;
-    background: canvas;
+  }
+  tr:last-child td {
+    border-bottom: none;
   }
   .url {
     max-width: 480px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    word-break: break-all;
   }
 </style>
