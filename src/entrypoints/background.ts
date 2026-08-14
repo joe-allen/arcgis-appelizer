@@ -1,40 +1,22 @@
 import { captureRequest } from "../utils/urlFilters";
+import type { RequestRow } from "../types";
 
 export default defineBackground(() => {
   const STORAGE_KEY = "networkRequests";
+  const TAB_KEY = "networkRequestsTabId";
   const MAX_ROWS = 500;
-
-  type RequestRow = {
-    size: number;
-    url: string;
-  };
 
   // In-memory buffer, hydrated from session storage so it survives brief
   // service-worker restarts within the same browser session.
   let rows: RequestRow[] = [];
+  let trackedTabId: number | null = null;
   const hydrated = browser.storage.session
-    .get(STORAGE_KEY)
+    .get([STORAGE_KEY, TAB_KEY])
     .then((stored) => {
       rows = (stored[STORAGE_KEY] as RequestRow[] | undefined) ?? [];
+      trackedTabId = (stored[TAB_KEY] as number | null | undefined) ?? null;
     })
     .catch(() => {});
-
-  const LAST_URL_KEY = "lastTabUrl";
-
-  browser.runtime.onMessage.addListener((message) => {
-    if (message?.type === "clearRequests") {
-      const incomingUrl: string | undefined = message.url;
-      browser.storage.session.get(LAST_URL_KEY).then((stored) => {
-        const lastUrl = stored[LAST_URL_KEY] as string | undefined;
-        const urlChanged = lastUrl !== undefined && incomingUrl !== lastUrl;
-        if (urlChanged) {
-          rows = [];
-          void browser.storage.session.set({ [STORAGE_KEY]: [] });
-        }
-        void browser.storage.session.set({ [LAST_URL_KEY]: incomingUrl });
-      });
-    }
-  });
 
   browser.webRequest.onCompleted.addListener(
     (details) => {
@@ -70,16 +52,28 @@ export default defineBackground(() => {
 
         rows.unshift(row);
         if (rows.length > MAX_ROWS) rows.length = MAX_ROWS;
-        void browser.storage.session.set({ [STORAGE_KEY]: rows });
+        trackedTabId = details.tabId;
+        void browser.storage.session.set({
+          [STORAGE_KEY]: rows,
+          [TAB_KEY]: trackedTabId,
+        });
       });
     },
     { urls: ["<all_urls>"] },
     ["responseHeaders"],
   );
 
-  // Reset to default icon when the tab navigates away.
+  // Clear captured data and reset icon when the tracked tab navigates.
   browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
     if (changeInfo.status === "loading") {
+      if (tabId === trackedTabId) {
+        rows = [];
+        trackedTabId = null;
+        void browser.storage.session.set({
+          [STORAGE_KEY]: [],
+          [TAB_KEY]: null,
+        });
+      }
       void browser.action.setIcon({
         tabId,
         path: {

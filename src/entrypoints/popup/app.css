@@ -7,15 +7,14 @@
   color-scheme: light dark;
 
   --c-primary: #7881fd;
-  --c-primary-dark: #535bf2;
+  --c-primary-hover: #535bf2;
   --c-accent: #54bc4a;
-  --c-foreground--light: #f4f4f4;
-  --c-background--light: #2b2b2b;
-  --c-foreground--dark: #2b2b2b;
-  --c-background--dark: #f4f4f4;
+  --c-foreground: #f4f4f4;
+  --c-border: #ddd;
+  --c-background: #2b2b2b;
 
-  color: var(--c-foreground--light);
-  background-color: var(--c-background--light);
+  color: var(--c-foreground);
+  background-color: var(--c-background);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -47,11 +46,11 @@ a {
   text-decoration: inherit;
 }
 a:hover {
-  color: var(--c-primary-dark);
+  color: var(--c-primary-hover);
 }
 a:active,
 a:focus {
-  color: var(--c-primary-dark);
+  color: var(--c-primary-hover);
 }
 
 h1 {
@@ -88,13 +87,13 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #2b2b2b;
-    background-color: #ffffff;
+    --c-foreground: #2b2b2b;
+    --c-background: #f4f4f4;
   }
   a:hover {
-    color: var(--c-primary-dark);
+    color: var(--c-primary-hover);
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--c-foreground);
   }
 }

@@ -23,6 +23,19 @@
     return `${(bytes / 1024).toFixed(1)} KB`;
   }
 
+  function serviceName(url: string): string {
+    const match = url.match(/\/services\/([^/]+)/);
+    if (!match) return url; // fallback to full URL
+    return match[1]
+      .replace(/[_-]/g, " ")
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
+  function layerNumber(url: string): string {
+    const match = url.match(/\/(\d+)\/?$/);
+    return match ? `${match[1]}` : "";
+  }
+
   onMount(() => {
     // Initial load.
     browser.storage.session.get(STORAGE_KEY).then((stored) => {
@@ -61,8 +74,13 @@
             onclick={(e) => {
               e.preventDefault();
               browser.tabs.create({ url: row.url, active: false });
-            }}>{row.url}</a
-          ></td
+            }}
+          >
+            <span>{serviceName(row.url)}</span>
+            {#if layerNumber(row.url)}
+              <span> ({layerNumber(row.url)})</span>
+            {/if}
+          </a></td
         >
         <td>{formatSize(row.size)}</td>
       </tr>
@@ -76,24 +94,43 @@
     border-collapse: collapse;
     font-size: 12px;
   }
+
   th,
   td {
     text-align: left;
-    padding: 4px 8px 4px 0;
-    border-bottom: 1px solid #ddd;
+    padding: 4px 4px 0;
+    border-bottom: 1px solid var(--c-border);
 
     a {
       display: inline-block;
     }
   }
+
   th {
     position: sticky;
+    background: var(--c-background);
     padding: 4px 0;
-    top: 0;
+    top: 1rem;
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -1rem 0 0;
+      height: 1rem;
+      width: 100%;
+      background: var(--c-background);
+    }
   }
+
   tr:last-child td {
     border-bottom: none;
   }
+
+  th:last-child,
+  td:last-child {
+    text-align: right;
+  }
+
   .url {
     max-width: 480px;
     word-break: break-all;
