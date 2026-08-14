@@ -30,15 +30,15 @@
 <main>
   <div class="logo-container">
     <a href="https://www.arcgis.com" target="_blank" rel="noreferrer">
-      {#if rows.length > 0}
-        <!-- <img src="/icon/128-active.png" class="logo active" alt="ArcGIS Logo" /> -->
-        <img src="/agol.svg" class="logo" alt="ArcGIS Logo" />
-      {:else}
-        <img src="/agol.svg" class="logo" alt="ArcGIS Logo" />
-      {/if}
+      <img src="/agol.svg" class="logo" alt="ArcGIS Logo" />
     </a>
     <h1>ArcGIS Appelizer</h1>
-    <img src={github} class="logo nohover github" alt="GitHub Logo" />
+    <a
+      href="https://github.com/joe-allen/arcgis-appelizer"
+      target="_blank"
+      rel="noreferrer"
+      ><img src={github} class="logo nohover github" alt="GitHub Logo" /></a
+    >
   </div>
 
   <div class="card">

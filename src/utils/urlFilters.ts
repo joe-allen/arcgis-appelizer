@@ -7,11 +7,17 @@ const EXCLUDED_PATTERNS = [
   ".css",
   ".ico",
   "f=pbf",
-  "VectorTileServer",
   "/query",
   "/MapServer/tile",
   "/MapServer/legend",
   "/attachments/",
+];
+
+/** Requests matching any of these regexes are excluded. */
+const EXCLUDED_REGEXES = [
+  // Exclude VectorTileServer sub-resources, but keep the bare endpoint
+  // (".../VectorTileServer" or ".../VectorTileServer/").
+  /VectorTileServer\/.+/,
 ];
 
 /**
@@ -20,5 +26,6 @@ const EXCLUDED_PATTERNS = [
  */
 export function captureRequest(url: string): boolean {
   if (!url.includes(REQUIRED_PATTERN)) return false;
-  return !EXCLUDED_PATTERNS.some((pattern) => url.includes(pattern));
+  if (EXCLUDED_PATTERNS.some((pattern) => url.includes(pattern))) return false;
+  return !EXCLUDED_REGEXES.some((re) => re.test(url));
 }
