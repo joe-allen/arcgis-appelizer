@@ -5,7 +5,7 @@ export default defineConfig({
   srcDir: "src",
   modules: ["@wxt-dev/module-svelte"],
   manifest: {
-    permissions: ["webRequest", "storage", "tabs", "favicon"],
+    permissions: ["webRequest", "storage", "tabs"],
     host_permissions: ["<all_urls>"],
   },
 });
